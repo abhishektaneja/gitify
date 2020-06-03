@@ -1,13 +1,13 @@
-const { ipcRenderer, remote } = require('electron');
+const {ipcRenderer, remote} = require('electron');
 
 import * as React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import styled from 'styled-components';
 
-import { AppState, SettingsState } from '../../types/reducers';
-import { fetchNotifications, updateSetting, logout } from '../actions';
-import { FieldCheckbox } from '../components/ui/checkbox';
-import { updateTrayIcon } from '../utils/comms';
+import {AppState, SettingsState} from '../../types/reducers';
+import {fetchNotifications, updateSetting, logout} from '../actions';
+import {FieldCheckbox} from '../components/ui/checkbox';
+import {updateTrayIcon} from '../utils/comms';
 
 const isLinux = remote.process.platform === 'linux';
 
@@ -78,147 +78,177 @@ const ButtonFooter = styled.button`
 `;
 
 interface IProps {
-  hasMultipleAccounts: boolean;
-  fetchNotifications: () => any;
-  logout: () => any;
-  settings: SettingsState;
-  updateSetting: any;
-  history: any;
+    hasMultipleAccounts: boolean;
+    fetchNotifications: () => any;
+    logout: () => any;
+    settings: SettingsState;
+    updateSetting: any;
+    history: any;
 }
 
 export class SettingsRoute extends React.Component<IProps> {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.state = {
-      participating: props.settings.participating,
-    };
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.settings.participating !== state.participating) {
-      props.fetchNotifications();
+        this.state = {
+            participating: props.settings.participating,
+        };
     }
 
-    return {
-      participating: props.settings.participating,
-    };
-  }
+    static getDerivedStateFromProps(props, state) {
+        if (props.settings.participating !== state.participating) {
+            props.fetchNotifications();
+        }
 
-  logout() {
-    this.props.logout();
-    this.props.history.goBack();
-    updateTrayIcon();
-  }
+        return {
+            participating: props.settings.participating,
+        };
+    }
 
-  quitApp() {
-    ipcRenderer.send('app-quit');
-  }
+    logout() {
+        this.props.logout();
+        this.props.history.goBack();
+        updateTrayIcon();
+    }
 
-  goToEnterprise() {
-    return this.props.history.replace('/enterpriselogin');
-  }
+    quitApp() {
+        ipcRenderer.send('app-quit');
+    }
 
-  render() {
-    const { hasMultipleAccounts, settings } = this.props;
+    goToEnterprise() {
+        return this.props.history.replace('/enterpriselogin');
+    }
 
-    return (
-      <Wrapper>
-        <Header>
-          <Title>Settings</Title>
+    render() {
+        const style = {
+            width: "100%",
+            padding: "12px 20px",
+            margin: "8px 0",
+            display: "inline-block",
+            border: "1px solid #ccc",
+            "border-radius": "4px",
+            "box-sizing": "border-box"
+        }
+        const {hasMultipleAccounts, settings} = this.props;
 
-          <ButtonClose
-            aria-label="Close Settings"
-            onClick={() => this.props.history.goBack()}
-          >
-            &times;
-          </ButtonClose>
-        </Header>
-        <Main>
-          <FieldCheckbox
-            name="showOnlyParticipating"
-            label="Show only participating"
-            checked={settings.participating}
-            onChange={(evt) =>
-              this.props.updateSetting('participating', evt.target.checked)
-            }
-          />
-          <FieldCheckbox
-            name="playSound"
-            label="Play sound"
-            checked={settings.playSound}
-            onChange={(evt) =>
-              this.props.updateSetting('playSound', evt.target.checked)
-            }
-          />
-          <FieldCheckbox
-            name="showNotifications"
-            label="Show notifications"
-            checked={settings.showNotifications}
-            onChange={(evt) =>
-              this.props.updateSetting('showNotifications', evt.target.checked)
-            }
-          />
-          <FieldCheckbox
-            name="onClickMarkAsRead"
-            label="On Click, Mark as Read"
-            checked={settings.markOnClick}
-            onChange={(evt) =>
-              this.props.updateSetting('markOnClick', evt.target.checked)
-            }
-          />
-          {!isLinux && (
-            <FieldCheckbox
-              name="openAtStartUp"
-              label="Open at startup"
-              checked={settings.openAtStartup}
-              onChange={(evt) =>
-                this.props.updateSetting('openAtStartup', evt.target.checked)
-              }
-            />
-          )}
-        </Main>
+        return (
+            <Wrapper>
+                <Header>
+                    <Title>Settings</Title>
 
-        <Footer>
-          <small>Gitify v{remote.app.getVersion()}</small>
+                    <ButtonClose
+                        aria-label="Close Settings"
+                        onClick={() => this.props.history.goBack()}
+                    >
+                        &times;
+                    </ButtonClose>
+                </Header>
+                <Main>
+                    <FieldCheckbox
+                        name="showOnlyParticipating"
+                        label="Show only participating"
+                        checked={settings.participating}
+                        onChange={(evt) =>
+                            this.props.updateSetting('participating', evt.target.checked)
+                        }
+                    />
+                    <FieldCheckbox
+                        name="playSound"
+                        label="Play sound"
+                        checked={settings.playSound}
+                        onChange={(evt) =>
+                            this.props.updateSetting('playSound', evt.target.checked)
+                        }
+                    />
+                    <FieldCheckbox
+                        name="showNotifications"
+                        label="Show notifications"
+                        checked={settings.showNotifications}
+                        onChange={(evt) =>
+                            this.props.updateSetting('showNotifications', evt.target.checked)
+                        }
+                    />
+                    <FieldCheckbox
+                        name="onClickMarkAsRead"
+                        label="On Click, Mark as Read"
+                        checked={settings.markOnClick}
+                        onChange={(evt) =>
+                            this.props.updateSetting('markOnClick', evt.target.checked)
+                        }
+                    />
+                    <FieldCheckbox
+                        name="usePAT"
+                        label="Use PAT token instead of oauth"
+                        checked={settings.usePAT}
+                        onChange={(evt) =>
+                            this.props.updateSetting('usePAT', evt.target.checked)
+                        }
+                    />
+                    <label htmlFor="patTokenId">Enter personal access token</label>
+                    <br/>
+                    <input
+                        style={style}
+                        id="patTokenId"
+                        name="patToken"
+                        type="text"
+                        value={settings.patToken ? "***" : ""}
+                        onChange={(evt) =>
+                            this.props.updateSetting('patToken', evt.target.value)
+                        }
+                        className="form-control"
+                    />
+                    {!isLinux && (
+                        <FieldCheckbox
+                            name="openAtStartUp"
+                            label="Open at startup"
+                            checked={settings.openAtStartup}
+                            onChange={(evt) =>
+                                this.props.updateSetting('openAtStartup', evt.target.checked)
+                            }
+                        />
+                    )}
+                </Main>
 
-          <div>
-            <ButtonFooter
-              aria-label="Login with GitHub Enterprise"
-              onClick={this.goToEnterprise.bind(this)}
-            >
-              Add Enterprise
-            </ButtonFooter>
+                <Footer>
+                    <small>Gitify v{remote.app.getVersion()}</small>
 
-            <ButtonFooter aria-label="Logout" onClick={this.logout.bind(this)}>
-              {hasMultipleAccounts ? 'Logout from all accounts' : 'Logout'}
-            </ButtonFooter>
+                    <div>
+                        <ButtonFooter
+                            aria-label="Login with GitHub Enterprise"
+                            onClick={this.goToEnterprise.bind(this)}
+                        >
+                            Add Enterprise
+                        </ButtonFooter>
 
-            <ButtonFooter aria-label="Quit Gitify" onClick={this.quitApp}>
-              Quit
-            </ButtonFooter>
-          </div>
-        </Footer>
-      </Wrapper>
-    );
-  }
+                        <ButtonFooter aria-label="Logout" onClick={this.logout.bind(this)}>
+                            {hasMultipleAccounts ? 'Logout from all accounts' : 'Logout'}
+                        </ButtonFooter>
+
+                        <ButtonFooter aria-label="Quit Gitify" onClick={this.quitApp}>
+                            Quit
+                        </ButtonFooter>
+                    </div>
+                </Footer>
+            </Wrapper>
+        );
+    }
 }
 
 export function mapStateToProps(state: AppState) {
-  const enterpriseAccounts = state.auth.enterpriseAccounts;
-  const isGitHubLoggedIn = state.auth.token !== null;
-  const hasMultipleAccounts = isGitHubLoggedIn
-    ? enterpriseAccounts.length > 0
-    : enterpriseAccounts.length > 1;
+    const enterpriseAccounts = state.auth.enterpriseAccounts;
+    const isGitHubLoggedIn = state.auth.token !== null;
+    const hasMultipleAccounts = isGitHubLoggedIn
+        ? enterpriseAccounts.length > 0
+        : enterpriseAccounts.length > 1;
 
-  return {
-    settings: state.settings,
-    hasMultipleAccounts,
-  };
+    return {
+        settings: state.settings,
+        hasMultipleAccounts,
+    };
 }
 
 export default connect(mapStateToProps, {
-  updateSetting,
-  fetchNotifications,
-  logout,
+    updateSetting,
+    fetchNotifications,
+    logout,
 })(SettingsRoute);
