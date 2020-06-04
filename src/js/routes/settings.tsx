@@ -190,8 +190,8 @@ export class SettingsRoute extends React.Component<IProps> {
                         style={style}
                         id="patTokenId"
                         name="patToken"
-                        type="text"
-                        value={settings.patToken ? "***" : ""}
+                        type="password"
+                        value={settings.patToken}
                         onChange={(evt) =>
                             this.props.updateSetting('patToken', evt.target.value)
                         }
