@@ -57,6 +57,16 @@ const ButtonClose = styled.button`
   }
 `;
 
+const InputField = styled.input`
+  width: 100%;
+  padding: 0.75em 1.25em;
+  margin: 0.5em 0;
+  display: inline-block;
+  border: 0.05em solid #ccc;
+  border-radius: 0.25em;
+  box-sizing: border-box;
+`;
+
 const ButtonFooter = styled.button`
   border: 0;
   padding: 0.25rem 0.5rem;
@@ -120,15 +130,6 @@ export class SettingsRoute extends React.Component<IProps> {
     }
 
     render() {
-        const style = {
-            width: "100%",
-            padding: "12px 20px",
-            margin: "8px 0",
-            display: "inline-block",
-            border: "1px solid #ccc",
-            "border-radius": "4px",
-            "box-sizing": "border-box"
-        }
         const {hasMultipleAccounts, settings} = this.props;
 
         return (
@@ -184,19 +185,21 @@ export class SettingsRoute extends React.Component<IProps> {
                             this.props.updateSetting('usePAT', evt.target.checked)
                         }
                     />
-                    <label htmlFor="patTokenId">Enter personal access token</label>
-                    <br/>
-                    <input
-                        style={style}
-                        id="patTokenId"
-                        name="patToken"
-                        type="password"
-                        value={settings.patToken}
-                        onChange={(evt) =>
-                            this.props.updateSetting('patToken', evt.target.value)
-                        }
-                        className="form-control"
-                    />
+                    <div style={{"display": (settings.usePAT ? "block" : "none")}}>
+                        <div>
+                            <label htmlFor="patTokenId">Enter personal access token</label>
+                        </div>
+                        <InputField
+                            id="patTokenId"
+                            name="patToken"
+                            type="password"
+                            value={settings.patToken}
+                            onChange={(evt) =>
+                                this.props.updateSetting('patToken', evt.target.value)
+                            }
+                            className="form-control"
+                        />
+                    </div>
                     {!isLinux && (
                         <FieldCheckbox
                             name="openAtStartUp"
