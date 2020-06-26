@@ -18,7 +18,7 @@ export function generateGitHubAPIUrl(hostname) {
     : `https://api.${hostname}/`;
 }
 
-export function generateGitHubWebUrl(url: string) {
+    export function generateGitHubWebUrl(url: string) {
   const { hostname } = parse(url);
   const isEnterprise =
     hostname !== `api.${Constants.DEFAULT_AUTH_OPTIONS.hostname}`;

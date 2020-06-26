@@ -51,12 +51,19 @@ export function formatReason(
   }
 }
 
-export function getNotificationTypeIcon(type: SubjectType): string {
+export function getNotificationIconColor(type: SubjectType): string {
+    return 'black';
+}
+
+
+export function getNotificationTypeIcon(type: string): string {
   switch (type) {
     case 'Issue':
       return 'issue-opened';
     case 'PullRequest':
       return 'git-pull-request';
+    case 'PullRequestMerged':
+          return 'git-merge';
     case 'Commit':
       return 'git-commit';
     case 'Release':

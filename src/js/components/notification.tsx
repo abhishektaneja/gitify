@@ -1,5 +1,5 @@
 const { shell } = require('electron');
-
+import { SubjectType } from '../../types/github';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { formatDistanceToNow, parseISO } from 'date-fns';
@@ -7,9 +7,9 @@ import Octicon, { Check, Mute, getIconByName } from '@primer/octicons-react';
 import styled from 'styled-components';
 
 import { AppState } from '../../types/reducers';
-import { formatReason, getNotificationTypeIcon } from '../utils/github-api';
+import { formatReason, getNotificationTypeIcon, getNotificationIconColor } from '../utils/github-api';
 import { generateGitHubWebUrl } from '../utils/helpers';
-import { markNotification, unsubscribeNotification } from '../actions';
+import { markNotification, unsubscribeNotification, getPullRequestInfo } from '../actions';
 import { Notification } from '../../types/github';
 
 const Wrapper = styled.div`
@@ -77,74 +77,75 @@ interface IProps {
   hostname: string;
   notification: Notification;
   markOnClick: boolean;
+  getPullRequestInfo?: (type: string, url: string, hostname: string) => void;
   markNotification: (id: string, hostname: string) => void;
   unsubscribeNotification?: (id: string, hostname: string) => void;
 }
 
 export const NotificationItem: React.FC<IProps> = (props) => {
-  const pressTitle = () => {
-    openBrowser();
+    const pressTitle = () => {
+        openBrowser();
 
-    if (props.markOnClick) {
-      markAsRead();
-    }
-  };
+        if (props.markOnClick) {
+            markAsRead();
+        }
+    };
 
-  const openBrowser = () => {
-    // Some Notification types from GitHub are missing urls in their subjects.
-    if (props.notification.subject.url) {
-      const url = generateGitHubWebUrl(props.notification.subject.url);
-      shell.openExternal(url);
-    }
-  };
+    const openBrowser = () => {
+        // Some Notification types from GitHub are missing urls in their subjects.
+        if (props.notification.subject.url) {
+            const url = generateGitHubWebUrl(props.notification.subject.url);
+            shell.openExternal(url);
+        }
+    };
 
-  const markAsRead = () => {
-    const { hostname, notification } = props;
-    props.markNotification(notification.id, hostname);
-  };
+    const markAsRead = () => {
+        const {hostname, notification} = props;
+        props.markNotification(notification.id, hostname);
+    };
 
-  const unsubscribe = (event: React.MouseEvent<HTMLElement>) => {
-    // Don't trigger onClick of parent element.
-    event.stopPropagation();
+    const unsubscribe = (event: React.MouseEvent<HTMLElement>) => {
+        // Don't trigger onClick of parent element.
+        event.stopPropagation();
 
-    const { hostname, notification } = props;
-    props.unsubscribeNotification(notification.id, hostname);
-  };
+        const {hostname, notification} = props;
+        props.unsubscribeNotification(notification.id, hostname);
+    };
 
-  const { notification } = props;
-  const reason = formatReason(notification.reason);
-  const typeIcon = getNotificationTypeIcon(notification.subject.type);
-  const updatedAt = formatDistanceToNow(parseISO(notification.updated_at), {
-    addSuffix: true,
-  });
+    const {notification} = props;
+    const reason = formatReason(notification.reason);
+    const typeIcon = getNotificationTypeIcon(notification.subject.type);
+    const updatedAt = formatDistanceToNow(parseISO(notification.updated_at), {
+        addSuffix: true,
+    });
 
-  return (
-    <Wrapper>
-      <IconWrapper>
-        <Octicon
-          icon={getIconByName(typeIcon)}
-          size={20}
-          ariaLabel={notification.subject.type}
-        />
-      </IconWrapper>
-      <Main onClick={() => pressTitle()} role="main">
-        <Title>{notification.subject.title}</Title>
+    return (
+        <Wrapper>
+            <IconWrapper style={{color: notification.subject.color}}>
+                <Octicon
+                    icon={getIconByName(typeIcon)}
+                    size={20}
+                    ariaLabel={notification.subject.type}
+                />
+            </IconWrapper>
+            <Main onClick={() => pressTitle()} role="main">
+                <Title>{notification.subject.title}</Title>
 
-        <Details>
-          <span title={reason.description}>{reason.type}</span> - Updated{' '}
-          {updatedAt}
-          <SecondaryButton title="Unsubscribe" onClick={(e) => unsubscribe(e)}>
-            <Octicon icon={Mute} size={13} ariaLabel="Unsubscribe" />
-          </SecondaryButton>
-        </Details>
-      </Main>
-      <IconWrapper>
-        <PrimaryButton title="Mark as Read" onClick={() => markAsRead()}>
-          <Octicon icon={Check} size={20} ariaLabel="Mark as Read" />
-        </PrimaryButton>
-      </IconWrapper>
-    </Wrapper>
-  );
+                <Details>
+                    <span title={reason.description}>{reason.type}</span> - Updated{' '}
+                    {updatedAt}
+                    <SecondaryButton title="Unsubscribe" onClick={(e) => unsubscribe(e)}>
+                        <Octicon icon={Mute} size={13} ariaLabel="Unsubscribe"/>
+                    </SecondaryButton>
+                </Details>
+            </Main>
+            <IconWrapper>
+                <PrimaryButton title="Mark as Read" onClick={() => markAsRead()}>
+                    <Octicon icon={Check} size={20} ariaLabel="Mark as Read"/>
+                </PrimaryButton>
+            </IconWrapper>
+        </Wrapper>
+    );
 };
 
 export function mapStateToProps(state: AppState) {
