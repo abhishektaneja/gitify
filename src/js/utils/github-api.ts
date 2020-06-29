@@ -1,4 +1,4 @@
-import { Reason, SubjectType } from '../../types/github';
+import {Reason, SubjectType} from '../../types/github';
 
 // prettier-ignore
 const DESCRIPTIONS = {
@@ -18,37 +18,54 @@ const DESCRIPTIONS = {
 };
 
 export function formatReason(
-  reason: Reason
+    reason: Reason, context: string,
 ): { type: string; description: string } {
-  // prettier-ignore
-  switch (reason) {
-    case 'assign':
-      return { type: 'Assign', description: DESCRIPTIONS['ASSIGN'] };
-    case 'author':
-      return { type: 'Author', description: DESCRIPTIONS['AUTHOR'] };
-    case 'comment':
-      return { type: 'Comment', description: DESCRIPTIONS['COMMENT'] };
-    case 'invitation':
-      return { type: 'Invitation', description: DESCRIPTIONS['INVITATION'] };
-    case 'manual':
-      return { type: 'Manual', description: DESCRIPTIONS['MANUAL'] };
-    case 'mention':
-      return { type: 'Mention', description: DESCRIPTIONS['MENTION'] };
-    case 'review_requested':
-      return { type: 'Review Requested', description: DESCRIPTIONS['REVIEW_REQUESTED'] };
-    case 'security_alert':
-      return { type: 'Security Alert', description: DESCRIPTIONS['SECURITY_ALERT'] };
-    case 'state_change':
-      return { type: 'State Change', description: DESCRIPTIONS['STATE_CHANGE'] };
-    case 'subscribed':
-      return { type: 'Subscribed', description: DESCRIPTIONS['SUBSCRIBED'] };
-    case 'team_mention':
-      return { type: 'Team Mention', description: DESCRIPTIONS['TEAM_MENTION'] };
-    case 'ci_activity':
-      return { type: 'Workflow Run', description: DESCRIPTIONS['CI_ACTIVITY'] };
-    default:
-      return { type: 'Unknown', description: DESCRIPTIONS['UNKNOWN'] };
-  }
+    // prettier-ignore
+    let result = {type: 'Unknown', description: DESCRIPTIONS['UNKNOWN']};
+    switch (reason) {
+        case 'assign':
+            result = {type: 'Assign', description: DESCRIPTIONS['ASSIGN']};
+            break
+        case 'author':
+            result = {type: 'Author', description: DESCRIPTIONS['AUTHOR']};
+            break;
+        case 'comment':
+            result = {type: 'Comment', description: DESCRIPTIONS['COMMENT']};
+            break;
+        case 'invitation':
+            result = {type: 'Invitation', description: DESCRIPTIONS['INVITATION']};
+            break;
+        case 'manual':
+            result = {type: 'Manual', description: DESCRIPTIONS['MANUAL']};
+            break;
+        case 'mention':
+            result = {type: 'Mention', description: DESCRIPTIONS['MENTION']};
+            break;
+        case 'review_requested':
+            result = {type: 'Review Requested', description: DESCRIPTIONS['REVIEW_REQUESTED']};
+            break;
+        case 'security_alert':
+            result = {type: 'Security Alert', description: DESCRIPTIONS['SECURITY_ALERT']};
+            break;
+        case 'state_change':
+            result = {type: 'State Change', description: DESCRIPTIONS['STATE_CHANGE']};
+            break;
+        case 'subscribed':
+            result = {type: 'Subscribed', description: DESCRIPTIONS['SUBSCRIBED']};
+            break;
+        case 'team_mention':
+            result = {type: 'Team Mention', description: DESCRIPTIONS['TEAM_MENTION']};
+            break;
+        case 'ci_activity':
+            result = {type: 'Workflow Run', description: DESCRIPTIONS['CI_ACTIVITY']};
+            break;
+        default:
+            result = {type: 'Unknown', description: DESCRIPTIONS['UNKNOWN']};
+    }
+    if (context !== "") {
+        result.type = `${context} - ${result.type}`
+    }
+    return result;
 }
 
 export function getNotificationIconColor(type: SubjectType): string {
@@ -57,22 +74,22 @@ export function getNotificationIconColor(type: SubjectType): string {
 
 
 export function getNotificationTypeIcon(type: string): string {
-  switch (type) {
-    case 'Issue':
-      return 'issue-opened';
-    case 'PullRequest':
-      return 'git-pull-request';
-    case 'PullRequestMerged':
-          return 'git-merge';
-    case 'Commit':
-      return 'git-commit';
-    case 'Release':
-      return 'tag';
-    case 'RepositoryVulnerabilityAlert':
-      return 'alert';
-    case 'CheckSuite':
-      return 'sync';
-    default:
-      return 'question';
-  }
+    switch (type) {
+        case 'Issue':
+            return 'issue-opened';
+        case 'PullRequest':
+            return 'git-pull-request';
+        case 'PullRequestMerged':
+            return 'git-merge';
+        case 'Commit':
+            return 'git-commit';
+        case 'Release':
+            return 'tag';
+        case 'RepositoryVulnerabilityAlert':
+            return 'alert';
+        case 'CheckSuite':
+            return 'sync';
+        default:
+            return 'question';
+    }
 }

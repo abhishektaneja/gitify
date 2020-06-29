@@ -107,6 +107,7 @@ export interface Subject {
   title: string;
   url?: string;
   color?: string;
+  context?: string;
   latest_comment_url?: string;
   type: SubjectType;
 }

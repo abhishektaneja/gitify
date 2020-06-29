@@ -134,6 +134,7 @@ export function fetchNotifications() {
                                 allNotifications[0].notifications[i].subject.type = info.type
                                 allNotifications[0].notifications[i].subject.color = info.color
                                 allNotifications[0].notifications[i].subject.state = info.state
+                                allNotifications[0].notifications[i].subject.context = info.context
 
                                 if (count === allNotifications[0].notifications.length - 1) {
                                     dispatch({
@@ -157,6 +158,7 @@ export function fetchNotifications() {
 export async function getPullRequestInfo(type, url, token) {
     if (type !== "PullRequest") {
         return {
+            context: "",
             state: undefined,
             type: type,
             color: "black",
@@ -166,6 +168,7 @@ export async function getPullRequestInfo(type, url, token) {
     const data = response.data;
     if (data.merged === true) {
         return {
+            context: "Merged",
             state: "merged",
             type: "PullRequestMerged",
             color: "purple",
@@ -173,9 +176,18 @@ export async function getPullRequestInfo(type, url, token) {
     }
     if (data.state === "closed" && data.merged === false) {
         return {
+            context: "Declined",
             state: "closed",
             type: "PullRequest",
-            color: "blue",
+            color: "red",
+        }
+    }
+    if (data.draft === true && data.merged === false) {
+        return {
+            context: "Draft",
+            state: "closed",
+            type: "PullRequest",
+            color: "grey",
         }
     }
     if (data.state === "open" && data.merged === false) {
@@ -183,18 +195,22 @@ export async function getPullRequestInfo(type, url, token) {
         const reviews = response2.data;
         let state = undefined
         let color = "black"
+        let context = "Open"
         for (const review of reviews) {
             if (color != "green" && review.state === "CHANGES_REQUESTED") {
+                context = "Rejected";
                 state = review.state;
-                color = "red"
+                color = "yellow"
             }
             if (review.state === "APPROVED") {
+                context = "Approved";
                 state = review.state;
                 color = "green"
                 break;
             }
         }
         return {
+            context: context,
             state: state,
             type: "PullRequest",
             color: color,

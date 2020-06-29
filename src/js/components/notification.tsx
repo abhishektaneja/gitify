@@ -113,7 +113,7 @@ export const NotificationItem: React.FC<IProps> = (props) => {
     };
 
     const {notification} = props;
-    const reason = formatReason(notification.reason);
+    const reason = formatReason(notification.reason, notification.subject.context);
     const typeIcon = getNotificationTypeIcon(notification.subject.type);
     const updatedAt = formatDistanceToNow(parseISO(notification.updated_at), {
         addSuffix: true,
@@ -132,7 +132,8 @@ export const NotificationItem: React.FC<IProps> = (props) => {
                 <Title>{notification.subject.title}</Title>
 
                 <Details>
-                    <span title={reason.description}>{reason.type}</span> - Updated{' '}
+                    <span title={reason.description}>{reason.type}
+                    </span> - Updated{' '}
                     {updatedAt}
                     <SecondaryButton title="Unsubscribe" onClick={(e) => unsubscribe(e)}>
                         <Octicon icon={Mute} size={13} ariaLabel="Unsubscribe"/>
